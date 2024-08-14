@@ -1,193 +1,133 @@
-2. Especificação das Classes
+Banco Digital
+# Banco Digital
 
-## 2.1. Classe Banco
+O Banco Digital é um sistema de gerenciamento bancário desenvolvido em Java. O sistema permite a criação e gerenciamento de contas bancárias, incluindo funcionalidades para depósitos, saques, transferências e visualização de saldo. Ele é projetado para ser executado no terminal e oferece uma interface de usuário simples e intuitiva.
 
-**Pacote:** com.banco.dominio.banco  
-**Responsabilidade:** Representar o banco e gerenciar as contas dos clientes.  
-**Atributos:**
+## Funcionalidades
 
-```java
-private String nome;
-private List<Conta> contas; // Lista para armazenar todas as contas do banco
+- Criar Conta: Permite a criação de contas correntes ou contas poupança para clientes.
+- Acessar Conta: Permite que os clientes acessem suas contas usando um número de conta e uma senha.
+- Realizar Depósitos: Permite o depósito de valores em uma conta.
+- Realizar Saques: Permite o saque de valores de uma conta.
+- Transferir Valores: Permite a transferência de valores entre contas.
+- Visualizar Saldo: Permite a visualização do saldo atual de uma conta.
+
+## Estrutura do Projeto
+
+O projeto é estruturado da seguinte forma:
+
+```
+src/
+├── main/
+│   └── java/
+│       └── com/
+│           └── banco/
+│               ├── Main.java
+│               ├── Sistema.java
+│               ├── dominio/
+│               │   ├── banco/
+│               │   │   └── Banco.java
+│               │   ├── cliente/
+│               │   │   └── Cliente.java
+│               │   ├── conta/
+│               │   │   ├── Conta.java
+│               │   │   ├── ContaCorrente.java
+│               │   │   └── ContaPoupanca.java
+│               │   └── transacao/
+│               │       ├── Transacao.java
+│               │       ├── Deposito.java
+│               │       ├── Saque.java
+│               │       └── Transferencia.java
+│               └── utils/
+│                   ├── Menus.java
+│                   └── ValidadorUtils.java
+└── test/
+    └── java/
+        └── com/
+            └── banco/
+                └── (testes unitários e de integração)
 ```
 
-**Métodos:**
+## Configuração
 
-```java
-public void adicionarConta(Conta conta); // Adiciona uma nova conta à lista de contas do banco.
-public Conta buscarConta(int numeroConta); // Busca uma conta pelo número.
-public List<Conta> listarContas(); // Retorna a lista de todas as contas.
+Para executar o projeto, siga as etapas abaixo:
+
+1. Clone o repositório:
+```
+git clone https://github.com/seu-usuario/banco-digital.git
 ```
 
-## 2.2. Classe Cliente
-
-**Pacote:** com.banco.dominio.cliente  
-**Responsabilidade:** Representar um cliente do banco.  
-**Atributos:**
-
-```java
-private String nome;
-private String cpf;
-private String endereco;
+2. Navegue até o diretório do projeto:
+```
+cd banco-digital
 ```
 
-**Métodos:**
+3. Compile o projeto:
+   - Se estiver usando o Maven, você pode compilar o projeto com:
+   ```
+   mvn compile
+   ```
+   - Ou, se estiver usando uma IDE, execute a classe Main diretamente.
 
-- Construtores, getters e setters para os atributos encapsulados.
+## Uso
 
-## 2.3. Classe Abstrata Conta
+### Menu Principal
 
-**Pacote:** com.banco.dominio.conta  
-**Responsabilidade:** Representar a abstração de uma conta bancária.  
-**Atributos:**
+Quando o sistema for iniciado, o menu principal será exibido:
 
-```java
-protected int numero;
-protected double saldo;
-protected Cliente cliente;
+```
+1. Criar Conta
+2. Acessar Conta
+3. Sair
 ```
 
-**Métodos:**
+Escolha uma opção digitando o número correspondente e siga as instruções exibidas na tela.
 
-```java
-public abstract void sacar(double valor);
-public abstract void depositar(double valor);
-public abstract void transferir(double valor, Conta contaDestino);
-public int getNumero(); // Retorna o número da conta.
-public double getSaldo(); // Retorna o saldo da conta.
+### Criar Conta
+
+Para criar uma conta, você deve fornecer o nome do cliente, CPF e senha. Em seguida, escolher o tipo de conta (Conta Corrente ou Conta Poupança).
+
+### Acessar Conta
+
+Para acessar uma conta, forneça o número da conta e a senha associada. Após autenticação, você poderá realizar operações na conta.
+
+### Operações da Conta
+
+- Depositar: Insira o valor a ser depositado.
+- Sacar: Insira o valor a ser sacado.
+- Transferir: Insira o número da conta de destino e o valor a ser transferido.
+- Visualizar Saldo: Mostra o saldo atual da conta.
+
+### Exemplo de Uso
+
+Criar uma Conta Corrente:
+
+```yaml
+Nome: João Silva
+CPF: 12345678901
+Senha: 1234
+Tipo de Conta: 1 (Conta Corrente)
 ```
 
-## 2.4. Classe ContaCorrente
+Acessar a Conta e Realizar uma Transferência:
 
-**Pacote:** com.banco.dominio.conta  
-**Herança:** extends Conta  
-**Responsabilidade:** Representar uma conta corrente, com funcionalidades específicas.  
-**Atributos:**
-
-```java
-private double limiteChequeEspecial; // Limite de cheque especial, por exemplo
+```yaml
+Número da Conta: 123
+Senha: 1234
+Valor a ser transferido: 100
+Número da conta de destino: 456
 ```
 
-**Métodos:**
+## Contribuição
 
-- Implementar os métodos abstratos da classe Conta.
-- Métodos específicos para o cheque especial, se necessário.
+Se você quiser contribuir para este projeto, siga estas etapas:
 
-## 2.5. Classe ContaPoupanca
+1. Faça um fork do repositório.
+2. Crie uma branch para sua feature (`git checkout -b minha-feature`).
+3. Faça commit das suas alterações (`git commit -am 'Adiciona nova feature'`).
+4. Faça push para a branch (`git push origin minha-feature`).
+5. Abra um Pull Request.
 
-**Pacote:** com.banco.dominio.conta  
-**Herança:** extends Conta  
-**Responsabilidade:** Representar uma conta poupança.  
-**Atributos:**
+## Licença
 
-```java
-private double taxaRendimento; // Taxa de rendimento da poupança
-```
-
-**Métodos:**
-
-- Implementar os métodos abstratos da classe Conta.
-- Métodos específicos para calcular o rendimento, se necessário.
-
-## 2.6. Interface Transacao
-
-**Pacote:** com.banco.dominio.transacao  
-**Responsabilidade:** Definir o contrato para transações bancárias.  
-**Métodos:**
-
-```java
-public void realizar(); // Método para realizar uma transação.
-public String getDetalhes(); // Retorna os detalhes da transação.
-```
-
-## 2.7. Classe Deposito
-
-**Pacote:** com.banco.dominio.transacao  
-**Implementação:** implements Transacao  
-**Responsabilidade:** Representar uma transação de depósito.  
-**Atributos:**
-
-```java
-private Conta conta;
-private double valor;
-private Date data;
-```
-
-**Métodos:**
-
-- Implementar os métodos da interface Transacao.
-
-## 2.8. Classe Saque
-
-**Pacote:** com.banco.dominio.transacao  
-**Implementação:** implements Transacao  
-**Responsabilidade:** Representar uma transação de saque.  
-**Atributos:**
-
-```java
-private Conta conta;
-private double valor;
-private Date data;
-```
-
-**Métodos:**
-
-- Implementar os métodos da interface Transacao.
-
-## 2.9. Classe Transferencia
-
-**Pacote:** com.banco.dominio.transacao  
-**Implementação:** implements Transacao  
-**Responsabilidade:** Representar uma transação de transferência entre contas.  
-**Atributos:**
-
-```java
-private Conta contaOrigem;
-private Conta contaDestino;
-private double valor;
-private Date data;
-```
-
-**Métodos:**
-
-- Implementar os métodos da interface Transacao.
-
-## 3. Serviços
-
-### 3.1. Classe ServicoConta
-
-**Pacote:** com.banco.servicos  
-**Responsabilidade:** Fornecer métodos para operações comuns com contas.  
-**Métodos:**
-
-```java
-public void realizarSaque(Conta conta, double valor);
-public void realizarDeposito(Conta conta, double valor);
-public void realizarTransferencia(Conta origem, Conta destino, double valor);
-```
-
-## 4. Utilitários
-
-### 4.1. Classe ValidadorCPF
-
-**Pacote:** com.banco.utils  
-**Responsabilidade:** Fornecer métodos para validação de CPF.  
-**Métodos:**
-
-```java
-public static boolean validar(String cpf);
-```
-
-## 5. Testes
-
-Colocar testes unitários no pacote src/test/java, seguindo a mesma estrutura de pacotes da aplicação. Para cada classe, crie testes que validem o comportamento esperado.
-
-## 6. Boas Práticas
-
-- Encapsulamento: Todos os atributos devem ser privados, acessíveis apenas via getters e setters.
-- Interfaces: Use interfaces para definir contratos claros, como no caso das transações.
-- Polimorfismo: Explore o polimorfismo nos métodos que operam sobre contas e transações.
-- Herança: Mantenha a hierarquia de classes simples e evite heranças profundas.
-- Coesão: Mantenha as classes coesas, focadas em uma única responsabilidade.
-
-Esta especificação deve fornecer uma base sólida para o desenvolvimento de um Banco Digital orientado a objetos em Java, aplicando conceitos essenciais como abstração, encapsulamento, herança e polimorfismo.
+Este projeto está licenciado sob a Licença MIT. Veja o arquivo LICENSE para mais detalhes.
