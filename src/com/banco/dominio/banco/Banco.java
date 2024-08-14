@@ -1,49 +1,78 @@
 package com.banco.dominio.banco;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import com.banco.dominio.conta.Conta;
 import com.banco.utils.ValidadorUtils;
 
+/**
+ * Classe que representa um banco com uma lista de contas.
+ */
 public class Banco {
     private String nome;
-    private List<Conta> contas = new ArrayList<>();
+    private List<Conta> contas;
 
+    /**
+     * Construtor padrão que inicializa a lista de contas.
+     */
+    public Banco() {
+        this.contas = new ArrayList<>();
+    }
+
+    /**
+     * Construtor que inicializa o nome e a lista de contas.
+     *
+     * @param nome   Nome do banco.
+     * @param contas Lista inicial de contas.
+     */
+    public Banco(String nome, List<Conta> contas) {
+        this.nome = nome;
+        this.contas = new ArrayList<>(contas);
+    }
+
+    /**
+     * Adiciona uma conta ao banco.
+     *
+     * @param conta Conta a ser adicionada.
+     * @throws IllegalStateException Se a conta for nula.
+     */
     public void adicionarConta(Conta conta) {
-        try {
-            ValidadorUtils.validarContaNull(conta);
-            contas.add(conta);
-        } catch (NullPointerException e) {
-            throw new IllegalStateException("Erro ao adicionar conta: a conta fornecida é nula.");
-        } catch (Exception e) {
-            throw new IllegalStateException("Erro inesperado ao adicionar conta.", e);
-        }
-
+        ValidadorUtils.validarContaNull(conta);
+        contas.add(conta);
     }
 
+    /**
+     * Busca uma conta pelo número.
+     *
+     * @param numeroConta Número da conta a ser buscada.
+     * @return Conta correspondente ao número fornecido.
+     * @throws IllegalStateException Se não houver contas cadastradas ou se a conta
+     *                               não for encontrada.
+     */
     public Conta buscarConta(int numeroConta) {
-        try {
-            if (contas.isEmpty()) {
-                throw new IllegalStateException("Não há contas cadastradas.");
-            }
-            return contas.stream().filter(c -> c.getNumero() == numeroConta).findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException());
-        } catch (Exception e) {
-            throw new IllegalStateException("Conta não encontrada.");
+        if (contas.isEmpty()) {
+            throw new IllegalStateException("Não há contas cadastradas.");
         }
+
+        return contas.stream()
+                .filter(c -> c.getNumero() == numeroConta)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Conta não encontrada."));
     }
 
+    /**
+     * Retorna uma lista não modificável de todas as contas.
+     *
+     * @return Lista de contas.
+     * @throws IllegalStateException Se ocorrer um erro ao listar as contas.
+     */
     public List<Conta> listarContas() {
-        try {
-            if (contas.isEmpty()) {
-                throw new IllegalStateException("Não há contas cadastradas.");
-            }
-            return Collections.unmodifiableList(contas);
-        } catch (Exception e) {
-            throw new IllegalStateException("Erro ao listar contas.");
+        if (contas.isEmpty()) {
+            throw new IllegalStateException("Não há contas cadastradas.");
         }
+        return Collections.unmodifiableList(contas);
     }
 
     public String getNome() {
@@ -55,10 +84,10 @@ public class Banco {
     }
 
     public List<Conta> getContas() {
-        return contas;
+        return Collections.unmodifiableList(contas);
     }
 
     public void setContas(List<Conta> contas) {
-        this.contas = contas;
+        this.contas = new ArrayList<>(contas);
     }
 }
