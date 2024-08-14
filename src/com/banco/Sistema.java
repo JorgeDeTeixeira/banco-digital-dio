@@ -12,6 +12,10 @@ import com.banco.dominio.transacao.Saque;
 import com.banco.dominio.transacao.Transferencia;
 import com.banco.utils.Menus;
 
+/**
+ * Classe responsável pela interação com o usuário e execução das operações
+ * bancárias.
+ */
 public class Sistema {
 
     private Banco banco;
@@ -28,10 +32,10 @@ public class Sistema {
 
         boolean executando = true;
         while (executando) {
-            Menus.menuPrincipal();
-            System.out.print("Escolha uma opção: ");
-            int opcao = scanner.nextInt();
-            scanner.nextLine();
+            Menus.exibirMenuPrincipal();
+            System.out.print("Digite uma opção:");
+            int opcao = obterOpcao();
+            scanner.nextLine(); // Limpa o buffer do scanner
 
             switch (opcao) {
                 case 1:
@@ -52,49 +56,56 @@ public class Sistema {
         scanner.close();
     }
 
+    private int obterOpcao() {
+        while (!scanner.hasNextInt()) {
+            System.out.println("Entrada inválida. Digite um número.");
+            scanner.next(); // Descarta a entrada inválida
+        }
+        return scanner.nextInt();
+    }
+
     private void criarConta() {
         System.out.println("Criando conta...");
-        System.out.print("Nome: ");
-        String nome = scanner.nextLine();
-        System.out.print("CPF: ");
-        String cpf = scanner.nextLine();
-        System.out.print("Senha: ");
-        int senha = scanner.nextInt();
-        scanner.nextLine();
+        String nome = obterEntrada("Nome: ");
+        String cpf = obterEntrada("CPF: ");
+        String senha = obterEntrada("Senha: ");
         Cliente cliente = new Cliente(nome, cpf, senha);
 
-        Menus.menuTipoConta();
-        System.out.print("Escolha uma opção: ");
-        int tipoConta = scanner.nextInt();
-        scanner.nextLine();
+        Menus.exibirMenuTipoConta();
+        System.out.print("Tipo da conta: ");
+        int tipoConta = obterOpcao();
 
-        Conta novaConta;
-        if (tipoConta == 1) {
-            novaConta = new ContaCorrente(cliente);
-        } else if (tipoConta == 2) {
-            novaConta = new ContaPoupanca(cliente);
+        Conta novaConta = criarTipoConta(cliente, tipoConta);
+
+        if (novaConta != null) {
+            banco.adicionarConta(novaConta);
+            System.out.println("Conta criada com sucesso!");
+            System.out.println("Cliente: " + cliente.getNome());
+            System.out.println("Número da Conta: " + novaConta.getNumero());
         } else {
-            System.out.println("Opção inválida, tente novamente.");
-            return;
+            System.out.println("Tipo de conta inválido. Conta não criada.");
         }
+    }
 
-        banco.adicionarConta(novaConta);
-        System.out.println("Conta criada com sucesso!");
-        System.out.println("Cliente: " + cliente.getNome());
-        System.out.println("Número da Conta: " + novaConta.getNumero());
+    private Conta criarTipoConta(Cliente cliente, int tipoConta) {
+        switch (tipoConta) {
+            case 1:
+                return new ContaCorrente(cliente);
+            case 2:
+                return new ContaPoupanca(cliente);
+            default:
+                return null;
+        }
     }
 
     private void acessarConta() {
         System.out.println("Acessando conta...");
-        System.out.print("Digite o número da conta: ");
-        int numeroConta = scanner.nextInt();
-        scanner.nextLine();
+        System.out.print("Digite o número da conta:");
+        int numeroConta = obterOpcao();
+        scanner.nextLine(); // Limpa o buffer do scanner
 
-        Conta conta;
-        try {
-            conta = banco.buscarConta(numeroConta);
-        } catch (Exception e) {
-            System.out.println("Conta não encontrada. Voltando ao menu principal.");
+        Conta conta = buscarConta(numeroConta);
+        if (conta == null) {
             return;
         }
 
@@ -111,24 +122,24 @@ public class Sistema {
         try {
             return banco.buscarConta(numeroConta);
         } catch (Exception e) {
-            System.out.println("Conta não encontrada.");
+            System.out.println("Conta não encontrada. " + e.getMessage());
             return null;
         }
     }
 
     private boolean autenticarConta(Conta conta) {
-        System.out.print("Digite a senha:");
+        String senha = obterEntrada("Digite a senha:");
         int tentativasRestantes = 3;
 
         while (tentativasRestantes > 0) {
-            int senha = scanner.nextInt();
-            scanner.nextLine();
-
-            if (senha == conta.getCliente().getSenha()) {
+            if (senha.equals(conta.getCliente().getSenha())) {
                 return true;
             } else {
                 tentativasRestantes--;
                 System.out.println("Senha incorreta, " + tentativasRestantes + " tentativas restantes.");
+                if (tentativasRestantes > 0) {
+                    senha = obterEntrada("Digite a senha:");
+                }
             }
         }
         return false;
@@ -137,10 +148,10 @@ public class Sistema {
     private void realizarOperacaoConta(Conta conta) {
         boolean continuar = true;
         while (continuar) {
-            Menus.menuConta();
-            System.out.print("Escolha uma opção: ");
-            int opcaoConta = scanner.nextInt();
-            scanner.nextLine();
+            Menus.exibirMenuContaOperacoes();
+            System.out.print("Digite uma opção:");
+            int opcaoConta = obterOpcao();
+            scanner.nextLine(); // Limpa o buffer do scanner
 
             switch (opcaoConta) {
                 case 1:
@@ -167,9 +178,7 @@ public class Sistema {
     }
 
     private void realizarDeposito(Conta conta) {
-        System.out.print("Valor a ser depositado: ");
-        double valorDeposito = scanner.nextDouble();
-        scanner.nextLine();
+        double valorDeposito = obterValor("Valor a ser depositado: ");
         try {
             Deposito deposito = new Deposito(conta, valorDeposito);
             deposito.realizar();
@@ -180,9 +189,7 @@ public class Sistema {
     }
 
     private void realizarSaque(Conta conta) {
-        System.out.print("Valor a ser sacada: ");
-        double valorSacado = scanner.nextDouble();
-        scanner.nextLine();
+        double valorSacado = obterValor("Valor a ser sacado: ");
         try {
             Saque saque = new Saque(conta, valorSacado);
             saque.realizar();
@@ -193,32 +200,38 @@ public class Sistema {
     }
 
     private void realizarTransferencia(Conta conta) {
-        System.out.print("Digite o número da conta de destino:");
-        int numeroContaDestino = scanner.nextInt();
-        scanner.nextLine();
-
+        System.out.print("Digite o número da conta de destino: ");
+        int numeroContaDestino = obterOpcao();
+        scanner.nextLine(); // Limpa o buffer do scanner
         Conta contaDestino = buscarConta(numeroContaDestino);
-        if (contaDestino == null) {
-            System.out.println("Conta de destino não encontrada. Voltando ao menu principal.");
+
+        if (contaDestino == null || contaDestino.equals(conta)) {
+            System.out.println("Conta de destino inválida. Voltando ao menu principal.");
             return;
         }
 
-        System.out.print("Valor a ser transferido: ");
-        double valorTransferencia = scanner.nextDouble();
-        scanner.nextLine();
-
-        if (conta.getSaldo() < valorTransferencia) {
-            System.out.println("Saldo insuficiente para realizar a transfência.");
-            return;
-        }
-
+        double valorTransferencia = obterValor("Valor a ser transferido: ");
         try {
             Transferencia transferencia = new Transferencia(conta, contaDestino, valorTransferencia);
             transferencia.realizar();
             System.out.println(transferencia.getDetalhes());
         } catch (Exception e) {
-            System.out.println("Erro ao realizar a tranferência: " + e.getMessage());
+            System.out.println("Erro ao realizar a transferência: " + e.getMessage());
         }
+    }
+
+    private double obterValor(String mensagem) {
+        System.out.print(mensagem);
+        while (!scanner.hasNextDouble()) {
+            System.out.println("Valor inválido. Digite um número válido.");
+            scanner.next(); // Descarta a entrada inválida
+        }
+        return scanner.nextDouble();
+    }
+
+    private String obterEntrada(String mensagem) {
+        System.out.print(mensagem);
+        return scanner.nextLine();
     }
 
     private void mostrarSaldo(Conta conta) {
