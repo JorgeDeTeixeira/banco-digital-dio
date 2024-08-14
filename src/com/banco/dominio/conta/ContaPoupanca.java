@@ -3,27 +3,49 @@ package com.banco.dominio.conta;
 import com.banco.dominio.cliente.Cliente;
 import com.banco.utils.ValidadorUtils;
 
+/**
+ * Representa uma conta poupança com taxa de rendimento.
+ */
 public class ContaPoupanca extends Conta {
-    private Double taxaRendimento;
+    private double taxaRendimento;
 
+    /**
+     * Construtor para inicializar uma conta poupança com um cliente.
+     *
+     * @param cliente Cliente associado à conta.
+     */
     public ContaPoupanca(Cliente cliente) {
         super(cliente);
-        this.taxaRendimento = 1.02;
+        this.taxaRendimento = 0.02; // Taxa padrão de 2%
     }
 
-    public Double getTaxaRendimento() {
+    /**
+     * Retorna a taxa de rendimento da conta poupança.
+     *
+     * @return Taxa de rendimento.
+     */
+    public double getTaxaRendimento() {
         return taxaRendimento;
     }
 
-    public void setTaxaRendimento(Double taxaRendimento) {
+    /**
+     * Define a taxa de rendimento da conta poupança.
+     *
+     * @param taxaRendimento Nova taxa de rendimento.
+     */
+    public void setTaxaRendimento(double taxaRendimento) {
+        ValidadorUtils.validarValor(taxaRendimento);
+        if (taxaRendimento < 0) {
+            throw new IllegalArgumentException("A taxa de rendimento não pode ser negativa.");
+        }
         this.taxaRendimento = taxaRendimento;
     }
 
     @Override
-    public void sacar(Double valor) {
+    public void sacar(double valor) {
         try {
             ValidadorUtils.validarValor(valor);
-            ValidadorUtils.validarSaldoSuficiente(saldo, valor);
+            ValidadorUtils.validarSaldoSuficiente(getSaldo(), valor);
             setSaldo(getSaldo() - valor);
         } catch (IllegalArgumentException e) {
             System.err.println("Erro ao sacar: " + e.getMessage());
@@ -31,7 +53,7 @@ public class ContaPoupanca extends Conta {
     }
 
     @Override
-    public void depositar(Double valor) {
+    public void depositar(double valor) {
         try {
             ValidadorUtils.validarValor(valor);
             setSaldo(getSaldo() + valor);
@@ -41,7 +63,7 @@ public class ContaPoupanca extends Conta {
     }
 
     @Override
-    public void transferir(Double valor, Conta contaDestino) {
+    public void transferir(double valor, Conta contaDestino) {
         try {
             ValidadorUtils.validarValor(valor);
             ValidadorUtils.validarSaldoSuficiente(getSaldo(), valor);
@@ -49,12 +71,20 @@ public class ContaPoupanca extends Conta {
             contaDestino.depositar(valor);
         } catch (IllegalArgumentException e) {
             System.err.println("Erro ao transferir: " + e.getMessage());
-
         }
     }
 
-    public void calcularRendimento() {
-        setSaldo(getSaldo() + getSaldo() * taxaRendimento);
+    /**
+     * Aplica o rendimento à conta poupança.
+     */
+    public void aplicarRendimento() {
+        double rendimento = getSaldo() * taxaRendimento;
+        setSaldo(getSaldo() + rendimento);
     }
 
+    @Override
+    public String toString() {
+        return String.format("Conta Poupança Número: %d, Saldo: %.2f, Taxa de Rendimento: %.2f%%, Cliente: %s",
+                getNumero(), getSaldo(), taxaRendimento * 100, getCliente().getNome());
+    }
 }

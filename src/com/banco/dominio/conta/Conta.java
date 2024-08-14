@@ -6,20 +6,18 @@ import com.banco.dominio.cliente.Cliente;
  * Classe abstrata que representa uma conta bancária.
  */
 public abstract class Conta {
-    private int numero;
-    protected double saldo;
-    private Cliente cliente;
+    private final int numero; // Tornar final para garantir a imutabilidade
+    private double saldo;
+    private final Cliente cliente; // Tornar final para garantir a imutabilidade
 
     /**
-     * Construtor para inicializar uma conta com número, saldo e cliente.
+     * Construtor para inicializar uma conta com um cliente.
      *
-     * @param numero  Número da conta
-     * @param saldo   Saldo inicial da conta
      * @param cliente Cliente associado à conta
      */
     public Conta(Cliente cliente) {
-        this.numero = (int) (Math.random() * 2000) + 1;
-        this.saldo = 0;
+        this.numero = gerarNumeroConta();
+        this.saldo = 0.0;
         this.cliente = cliente;
     }
 
@@ -28,14 +26,14 @@ public abstract class Conta {
      *
      * @param valor Valor a ser sacado
      */
-    public abstract void sacar(Double valor);
+    public abstract void sacar(double valor);
 
     /**
      * Método abstrato para depositar um valor na conta.
      *
      * @param valor Valor a ser depositado
      */
-    public abstract void depositar(Double valor);
+    public abstract void depositar(double valor);
 
     /**
      * Método abstrato para transferir um valor para outra conta.
@@ -43,7 +41,7 @@ public abstract class Conta {
      * @param valor        Valor a ser transferido
      * @param contaDestino Conta de destino para a transferência
      */
-    public abstract void transferir(Double valor, Conta contaDestino);
+    public abstract void transferir(double valor, Conta contaDestino);
 
     /**
      * Retorna o número da conta.
@@ -59,7 +57,7 @@ public abstract class Conta {
      *
      * @return Saldo da conta
      */
-    public Double getSaldo() {
+    public double getSaldo() {
         return saldo;
     }
 
@@ -77,16 +75,22 @@ public abstract class Conta {
      *
      * @param saldo Novo saldo da conta
      */
-    protected void setSaldo(Double saldo) {
+    protected void setSaldo(double saldo) {
         this.saldo = saldo;
     }
 
     /**
-     * Exibe informações da conta.
+     * Gera um número de conta único.
      *
-     * @return String formatada com informações da conta
+     * @return Número da conta gerado
      */
-    public String exibirInformacoes() {
+    private int gerarNumeroConta() {
+        // Implementar lógica para garantir unicidade e evitar colisões
+        return (int) (Math.random() * 10000); // Exemplo simplificado
+    }
+
+    @Override
+    public String toString() {
         return String.format("Conta Número: %d, Saldo: %.2f, Cliente: %s", numero, saldo, cliente.getNome());
     }
 }
